@@ -67,6 +67,7 @@ import org.linphone.mediastream.Version;
 import org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration;
 import org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera;
 import org.linphone.mediastream.video.capture.hwconf.Hacks;
+import org.linphone.ui.LinphoneVideoView;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -864,6 +865,12 @@ public class LinphoneManager implements LinphoneCoreListener {
 		}
 
 		if (state == State.CallEnd) {
+			LinphoneVideoView video = getLinphoneVideoIfAvailable();
+			if (video != null) {
+				video.release();
+			}
+			setLinphoneVideo(null);
+			
 			if (mLc.getCallsNb() == 0) {
 				if (mIncallWakeLock != null && mIncallWakeLock.isHeld()) {
 					mIncallWakeLock.release();
@@ -1307,5 +1314,15 @@ public class LinphoneManager implements LinphoneCoreListener {
 			int delay_ms, Object data) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private LinphoneVideoView mLinphoneVideo;
+
+	public LinphoneVideoView getLinphoneVideoIfAvailable() {
+		return mLinphoneVideo;
+	}
+	
+	public void setLinphoneVideo(LinphoneVideoView view) {
+		mLinphoneVideo = view;
 	}
 }

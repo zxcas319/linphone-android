@@ -23,6 +23,7 @@ import org.linphone.ui.AddressAware;
 import org.linphone.ui.AddressText;
 import org.linphone.ui.CallButton;
 import org.linphone.ui.EraseButton;
+import org.linphone.ui.LinphoneVideoView;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -33,6 +34,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 
 /**
  * @author Sylvain Berfini
@@ -47,12 +50,15 @@ public class DialerFragment extends Fragment {
 	private ImageView mAddContact;
 	private OnClickListener addContactListener, cancelListener, transferListener;
 	private boolean shouldEmptyAddressField = true;
+	private RelativeLayout mBackground;
+	private boolean isVideoSet = false;
 	
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, 
         Bundle savedInstanceState) {
 		instance = this;
-        View view = inflater.inflate(R.layout.dialer, container, false);
+		View view = inflater.inflate(R.layout.dialer, container, false);
+		mBackground = (RelativeLayout) view.findViewById(R.id.dialer_bg);
 		
 		mAddress = (AddressText) view.findViewById(R.id.Adress); 
 		mAddress.setDialerFragment(this);
@@ -149,6 +155,18 @@ public class DialerFragment extends Fragment {
 		resetLayout(isCallTransferOngoing);
 	}
 	
+	@Override
+	public void onPause() {
+		if (isVideoSet && mBackground != null) {
+			View video = LinphoneManager.getInstance().getLinphoneVideoIfAvailable();
+			if (video != null) {
+				mBackground.removeView(video);
+				isVideoSet = false;
+			}
+		}
+		super.onPause();
+	}
+	
 	public void resetLayout(boolean callTransfer) {
 		isCallTransferOngoing = callTransfer;
 		LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
@@ -167,6 +185,14 @@ public class DialerFragment extends Fragment {
 			mAddContact.setEnabled(true);
 			mAddContact.setImageResource(R.drawable.cancel);
 			mAddContact.setOnClickListener(cancelListener);
+			
+			LinphoneVideoView video = LinphoneManager.getInstance().getLinphoneVideoIfAvailable();
+			if (video != null && !isVideoSet && mBackground != null) {
+				LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				video.setPreviewVisibility(false);
+				mBackground.addView(video, 0, params);
+				isVideoSet = true;
+			}
 		} else {
 			mCall.setImageResource(R.drawable.call);
 			mAddContact.setEnabled(true);

@@ -29,5 +29,8 @@
 	<string name="button_sip_contacts">SIP</string>
 
     <string name="tunnel_host"></string>
+    
+    <integer name="video_preview_w">120</integer>
+    <integer name="video_preview_h">145</integer>
 </resources>
  
