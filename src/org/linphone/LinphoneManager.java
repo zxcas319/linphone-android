@@ -167,6 +167,7 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 		mRingbackSoundFile = basePath + "/ringback.wav";
 		mPauseSoundFile = basePath + "/toy_mono.wav";
 		mChatDatabaseFile = basePath + "/linphone-history.db";
+		mFriendsDatabaseFile = basePath + "/linphone-friends.db";
 		mCallLogDatabaseFile = basePath + "/linphone-log-history.db";
 		mErrorToneFile = basePath + "/error.wav";
 		mConfigFile = basePath + "/configrc";
@@ -191,6 +192,7 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 	private final String mRingbackSoundFile;
 	private final String mPauseSoundFile;
 	private final String mChatDatabaseFile;
+	private final String mFriendsDatabaseFile;
 	private final String mCallLogDatabaseFile;
 	private final String mErrorToneFile;
 	private final String mConfigFile;
@@ -653,6 +655,7 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 		mLc.setPlayFile(mPauseSoundFile);
 		mLc.setChatDatabasePath(mChatDatabaseFile);
 		mLc.setCallLogsDatabasePath(mCallLogDatabaseFile);
+		mLc.setFriendsDatabasePath(mFriendsDatabaseFile);
 		//mLc.setCallErrorTone(Reason.NotFound, mErrorToneFile);
 
 		int availableCores = Runtime.getRuntime().availableProcessors();
