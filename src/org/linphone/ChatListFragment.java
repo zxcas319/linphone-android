@@ -57,6 +57,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -70,7 +71,7 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 	private ListView chatList;
 	private TextView noChatHistory;
 	private ImageView edit, selectAll, deselectAll, delete, newDiscussion, contactPicture, cancel, backInCall;
-	private RelativeLayout editList, topbar;
+	private LinearLayout editList, topbar;
 	private boolean isEditMode = false;
 	
 	@Override
@@ -85,8 +86,8 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 		
 		noChatHistory = (TextView) view.findViewById(R.id.noChatHistory);
 
-		editList = (RelativeLayout) view.findViewById(R.id.edit_list);
-		topbar = (RelativeLayout) view.findViewById(R.id.top_bar);
+		editList = (LinearLayout) view.findViewById(R.id.edit_list);
+		topbar = (LinearLayout) view.findViewById(R.id.top_bar);
 
 		cancel = (ImageView) view.findViewById(R.id.cancel);
 		cancel.setOnClickListener(this);
@@ -201,7 +202,7 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 		if (LinphoneManager.getLc().getCallsNb() > 0) {
 			backInCall.setVisibility(View.VISIBLE);
 		} else {
-			backInCall.setVisibility(View.GONE);
+			backInCall.setVisibility(View.INVISIBLE);
 		}
 
 		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LinphoneActivity.instance());
@@ -456,7 +457,7 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 			TextView date = (TextView) view.findViewById(R.id.date);
 			TextView displayName = (TextView) view.findViewById(R.id.sipUri);
 			TextView unreadMessages = (TextView) view.findViewById(R.id.unreadMessages);
-			CheckBox select = (CheckBox) view.findViewById(R.id.delete);
+			CheckBox select = (CheckBox) view.findViewById(R.id.delete_chatroom);
 			ImageView contactPicture = (ImageView) view.findViewById(R.id.contact_picture);
 
 			LinphoneChatRoom chatRoom = LinphoneManager.getLc().getChatRoom(address);
@@ -483,6 +484,8 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 
 			if(contact != null){
 				LinphoneUtils.setImagePictureFromUri(view.getContext(), contactPicture, contact.getPhotoUri(), contact.getThumbnailUri());
+			} else {
+				contactPicture.setImageResource(R.drawable.avatar);
 			}
 
 			if (unreadMessagesCount > 0) {
@@ -504,12 +507,12 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 					@Override
 					public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 						chatList.setItemChecked(position, b);
-						if(getNbItemsChecked() == getCount()){
+						if (getNbItemsChecked() == getCount()) {
 							deselectAll.setVisibility(View.VISIBLE);
 							selectAll.setVisibility(View.GONE);
 							enabledDeleteButton(true);
 						} else {
-							if(getNbItemsChecked() == 0){
+							if (getNbItemsChecked() == 0) {
 								deselectAll.setVisibility(View.GONE);
 								selectAll.setVisibility(View.VISIBLE);
 								enabledDeleteButton(false);
@@ -522,7 +525,7 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 					}
 				});
 				if(chatList.isItemChecked(position)) {
-					enabledDeleteButton(true);
+					select.setChecked(true);
 				} else {
 					select.setChecked(false);
 				}
@@ -531,7 +534,6 @@ public class ChatListFragment extends Fragment implements OnClickListener, OnIte
 					unreadMessages.setVisibility(View.VISIBLE);
 				}
 			}
-			
 			return view;
 		}
 	}

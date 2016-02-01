@@ -716,15 +716,15 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 		lInputStream.close();
 	}
 
-	public void loadConfig(int config_rc){
-		try {
-			copyIfNotExist(config_rc, mConfigFile);
-		} catch (Exception e){
-			Log.w(e);
-		}
-		LinphonePreferences.instance().setRemoteProvisioningUrl("file://" + mConfigFile);
-		getLc().getConfig().setInt("misc","transient_provisioning",1);
-	}
+	//public void loadConfig(){
+	//	try {
+	//		copyIfNotExist(R.raw.configrc, mConfigFile);
+	//	} catch (Exception e){
+	//		Log.w(e);
+	//	}
+	//	LinphonePreferences.instance().setRemoteProvisioningUrl("file://" + mConfigFile);
+	//	getLc().getConfig().setInt("misc","transient_provisioning",1);
+	//}
 
 
 	public boolean detectVideoCodec(String mime) {
@@ -827,7 +827,11 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 	private Vibrator mVibrator;
 
 	public void displayWarning(LinphoneCore lc, String message) {}
-	public void authInfoRequested(LinphoneCore lc, String realm, String username, String domain) {}
+
+	public void authInfoRequested(LinphoneCore lc, String realm, String username, String domain) {
+		//Dialog authInfoPassword = LinphoneActivity.instance().displayPasswordDialog(username, realm, domain);
+		//authInfoPassword.show();
+	}
 	public void byeReceived(LinphoneCore lc, String from) {}
 	public void displayMessage(LinphoneCore lc, String message) {}
 	public void show(LinphoneCore lc) {}
@@ -1291,7 +1295,6 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 			Log.i("proximity sensor already active for " + activity.getLocalClassName());
 			return;
 		}
-
 		if (sProximityDependentActivities.isEmpty()) {
 			SensorManager sm = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
 			Sensor s = sm.getDefaultSensor(Sensor.TYPE_PROXIMITY);

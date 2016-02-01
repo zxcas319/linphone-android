@@ -304,13 +304,13 @@ openh264-install-headers:
 	mkdir -p $(OPENH264_SRC_DIR)/include/wels
 	rsync -rvLpgoc --exclude ".git"  $(OPENH264_SRC_DIR)/codec/api/svc/* $(OPENH264_SRC_DIR)/include/wels/.
 
-copy-openh264-x86: openh264-patch openh264-install-headers
+copy-openh264-x86:  openh264-install-headers
 	mkdir -p $(OPENH264_BUILD_DIR)
 	mkdir -p $(OPENH264_BUILD_DIR_X86)
 	cd $(OPENH264_BUILD_DIR_X86) \
 	&& rsync -rvLpgoc --exclude ".git"  $(OPENH264_SRC_DIR)/* .
 
-copy-openh264-arm: openh264-patch openh264-install-headers
+copy-openh264-arm:  openh264-install-headers
 	mkdir -p $(OPENH264_BUILD_DIR)
 	mkdir -p $(OPENH264_BUILD_DIR_ARM)
 	cd $(OPENH264_BUILD_DIR_ARM) \
@@ -340,7 +340,7 @@ endif
 endif
 LIBVPX_SRC_DIR=$(TOPDIR)/submodules/externals/libvpx
 LIBVPX_BUILD_DIR=$(TOPDIR)/submodules/externals/build/libvpx
-LIBVPX_CONFIGURE_OPTIONS=--disable-vp9 --disable-examples --disable-unit-tests --disable-postproc --enable-error-concealment --enable-debug
+LIBVPX_CONFIGURE_OPTIONS=--disable-vp9 --disable-examples --disable-unit-tests --disable-postproc --enable-error-concealment --enable-pic
 
 $(LIBVPX_SRC_DIR)/configure_android_x86_patch_applied.txt:
 	cd $(LIBVPX_SRC_DIR) && patch -p1 < $(TOPDIR)/patches/libvpx_configure_android_x86.patch
@@ -420,8 +420,8 @@ prepare-liblinphone_tester: $(TOPDIR)/submodules/linphone/tester/tester_hosts $(
 
 
 #Matroska2
-MATROSKA_SRC_DIR=$(TOPDIR)/submodules/externals/libmatroska
-MATROSKA_BUILD_DIR=$(TOPDIR)/submodules/externals/build/libmatroska
+MATROSKA_SRC_DIR=$(TOPDIR)/submodules/externals/libmatroska-c
+MATROSKA_BUILD_DIR=$(TOPDIR)/submodules/externals/build/libmatroska-c
 ifeq ($(BUILD_MATROSKA), 1)
 prepare-matroska2: $(MATROSKA_SRC_DIR)/patch_applied.txt
 else
