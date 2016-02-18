@@ -146,7 +146,7 @@ public class AssistantActivity extends Activity implements OnClickListener {
 	private void initUI() {
 		back = (ImageView) findViewById(R.id.back);
 		back.setOnClickListener(this);
-		cancel = (ImageView) findViewById(R.id.cancel);
+		cancel = (ImageView) findViewById(R.id.assistant_cancel);
 		cancel.setOnClickListener(this);
 	}
 	
@@ -160,7 +160,8 @@ public class AssistantActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		int id = v.getId();
 		
-		if (id == R.id.cancel) {
+		if (id == R.id.assistant_cancel) {
+			hideKeyboard();
 			LinphonePreferences.instance().firstLaunchSuccessful();
 			if (getResources().getBoolean(R.bool.setup_cancel_move_to_back)) {
 				moveTaskToBack(true);
@@ -169,6 +170,7 @@ public class AssistantActivity extends Activity implements OnClickListener {
 				finish();
 			}
 		} else if (id == R.id.back) {
+			hideKeyboard();
 			onBackPressed();
 		}
 	}
@@ -196,6 +198,14 @@ public class AssistantActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	public void hideKeyboard(){
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		View view = this.getCurrentFocus();
+		if (imm != null && view != null) {
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
+	}
+
 	private void launchEchoCancellerCalibration(boolean sendEcCalibrationResult) {
 		boolean needsEchoCalibration = LinphoneManager.getLc().needsEchoCalibration();
 		if (needsEchoCalibration && mPrefs.isFirstLaunch()) {
@@ -211,14 +221,9 @@ public class AssistantActivity extends Activity implements OnClickListener {
 	}
 
 	private void logIn(String username, String password, String displayName, String domain, TransportType transport, boolean sendEcCalibrationResult) {
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		if (imm != null && getCurrentFocus() != null) {
-			imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-		}
-
         saveCreatedAccount(username, password, displayName, domain, transport);
 	}
-	
+
 	public void checkAccount(String username, String password, String displayName, String domain) {
 		saveCreatedAccount(username, password, displayName, domain, null);
 	}

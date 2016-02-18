@@ -172,6 +172,7 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 		mCallLogDatabaseFile = basePath + "/linphone-log-history.db";
 		mErrorToneFile = basePath + "/error.wav";
 		mConfigFile = basePath + "/configrc";
+		mUserCertificatePath = basePath;
 
 		mPrefs = LinphonePreferences.instance();
 		mAudioManager = ((AudioManager) c.getSystemService(Context.AUDIO_SERVICE));
@@ -197,6 +198,7 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 	private final String mCallLogDatabaseFile;
 	private final String mErrorToneFile;
 	private final String mConfigFile;
+	private final String mUserCertificatePath;
 	private ByteArrayInputStream mUploadingImageStream;
 
 	private Timer mTimer;
@@ -646,17 +648,19 @@ public class LinphoneManager implements LinphoneCoreListener, LinphoneChatMessag
 		} catch (NameNotFoundException e) {
 			Log.e(e, "cannot get version name");
 		}
-
+		mLc.setRing(mRingSoundFile);
 		if (mR.getBoolean(R.bool.use_linphonecore_ringing)) {
 			disableRinging();
 		} else {
-			mLc.setRing(null);
+			mLc.setRing(null); //We'll use the android media player api to play the ringtone
 		}
+		mLc.setRingback(mRingbackSoundFile);
 		mLc.setRootCA(mLinphoneRootCaFile);
 		mLc.setPlayFile(mPauseSoundFile);
 		mLc.setChatDatabasePath(mChatDatabaseFile);
 		mLc.setCallLogsDatabasePath(mCallLogDatabaseFile);
 		mLc.setFriendsDatabasePath(mFriendsDatabaseFile);
+		mLc.setUserCertificatesPath(mUserCertificatePath);
 		//mLc.setCallErrorTone(Reason.NotFound, mErrorToneFile);
 
 		int availableCores = Runtime.getRuntime().availableProcessors();

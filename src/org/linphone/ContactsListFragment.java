@@ -213,7 +213,7 @@ public class ContactsListFragment extends Fragment implements OnClickListener, O
 
 		if (id == R.id.delete) {
 			final Dialog dialog = LinphoneActivity.instance().displayDialog(getString(R.string.delete_text));
-			Button delete = (Button) dialog.findViewById(R.id.delete);
+			Button delete = (Button) dialog.findViewById(R.id.delete_button);
 			Button cancel = (Button) dialog.findViewById(R.id.cancel);
 
 			delete.setOnClickListener(new OnClickListener() {
@@ -320,6 +320,17 @@ public class ContactsListFragment extends Fragment implements OnClickListener, O
 		editList.setVisibility(View.GONE);
 		topbar.setVisibility(View.VISIBLE);
 		invalidate();
+		if(getResources().getBoolean(R.bool.isTablet)){
+			displayFirstContact();
+		}
+	}
+
+	public void displayFirstContact(){
+		if(contactsList.getAdapter().getCount() > 0) {
+			LinphoneActivity.instance().displayContact((Contact) contactsList.getAdapter().getItem(0), false);
+		} else {
+			LinphoneActivity.instance().displayEmptyFragment();
+		}
 	}
 
 	private void searchContacts() {

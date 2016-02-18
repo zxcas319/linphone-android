@@ -449,22 +449,26 @@ public class ChatFragment extends Fragment implements OnClickListener, LinphoneC
 		LinphoneCore lc = LinphoneManager.getLcIfManagerNotDestroyedOrNull();
 
 		LinphoneAddress lAddress = null;
-		try {
-			lAddress = lc.interpretUrl(sipUri);
-		} catch (Exception e){
-			//TODO Error popup and quit chat
-		}
+		if(sipUri == null){
+			initNewChatConversation();
+		} else {
+			try {
+				lAddress = lc.interpretUrl(sipUri);
+			} catch (Exception e) {
+				//TODO Error popup and quit chat
+			}
 
-		if (lAddress != null) {
-			chatRoom = lc.getChatRoom(lAddress);
-			chatRoom.markAsRead();
-			contact = ContactsManager.getInstance().findContactWithAddress(getActivity().getContentResolver(), lAddress);
-			if(chatRoom != null) {
-				displayChatHeader(lAddress);
-				dispayMessageList();
+			if (lAddress != null) {
+				chatRoom = lc.getChatRoom(lAddress);
+				chatRoom.markAsRead();
+				LinphoneActivity.instance().updateMissedChatCount();
+				contact = ContactsManager.getInstance().findContactWithAddress(getActivity().getContentResolver(), lAddress);
+				if (chatRoom != null) {
+					displayChatHeader(lAddress);
+					dispayMessageList();
+				}
 			}
 		}
-
 	}
 
 	public void dispayMessageList() {
@@ -663,7 +667,7 @@ public class ChatFragment extends Fragment implements OnClickListener, LinphoneC
 		}
 		if (id == R.id.delete) {
 			final Dialog dialog = LinphoneActivity.instance().displayDialog(getString(R.string.delete_text));
-			Button delete = (Button) dialog.findViewById(R.id.delete);
+			Button delete = (Button) dialog.findViewById(R.id.delete_button);
 			Button cancel = (Button) dialog.findViewById(R.id.cancel);
 
 			delete.setOnClickListener(new OnClickListener() {
@@ -720,7 +724,7 @@ public class ChatFragment extends Fragment implements OnClickListener, LinphoneC
 
 		//Start new conversation in fast chat
 		if(newChatConversation && chatRoom == null) {
-			String address = searchContactField.getText().toString();
+			String address = searchContactField.getText().toString().toLowerCase();
 			if (address != null && !address.equals("")) {
 				initChatRoom(address);
 			}
@@ -956,8 +960,14 @@ public class ChatFragment extends Fragment implements OnClickListener, LinphoneC
 		messagesList.setVisibility(View.VISIBLE);
 		contactName.setVisibility(View.VISIBLE);
 		edit.setVisibility(View.VISIBLE);
-		back.setVisibility(View.VISIBLE);
 		startCall.setVisibility(View.VISIBLE);
+
+		if(getResources().getBoolean(R.bool.isTablet)){
+			back.setVisibility(View.INVISIBLE);
+		} else {
+			back.setOnClickListener(this);
+		}
+
 		newChatConversation = false;
 		initChatRoom(sipUri);
 	}
@@ -967,11 +977,11 @@ public class ChatFragment extends Fragment implements OnClickListener, LinphoneC
 		edit.setVisibility(View.INVISIBLE);
 		startCall.setVisibility(View.INVISIBLE);
 		contactName.setVisibility(View.INVISIBLE);
-
 		resultContactsSearch.setVisibility(View.VISIBLE);
 		searchAdapter = new SearchContactsListAdapter(null);
 		resultContactsSearch.setAdapter(searchAdapter);
 		searchContactField.setVisibility(View.VISIBLE);
+		searchContactField.requestFocus();
 		searchContactField.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -1008,7 +1018,7 @@ public class ChatFragment extends Fragment implements OnClickListener, LinphoneC
 			for (ContactAddress c : searchAdapter.contacts) {
 				String address = c.address;
 				if(address.startsWith("sip:")) address = address.substring(4);
-				if (c.contact.getName().toLowerCase().startsWith(search) || address.toLowerCase().startsWith(search)) {
+				if (c.contact.getName().toLowerCase().startsWith(search.toLowerCase()) || address.toLowerCase().startsWith(search.toLowerCase())) {
 					result.add(c);
 				}
 			}
