@@ -67,7 +67,7 @@
 	url = git://git.linphone.org/cunit.git
 [submodule "submodules/externals/axmlrpc"]
 	path = submodules/externals/axmlrpc
-	url = git://git.linphone.org/axmlrpc.git
+	url = https://github.com/gturri/aXMLRPC
 [submodule "submodules/externals/polarssl"]
 	path = submodules/externals/polarssl
 	url = git://git.linphone.org/polarssl.git
@@ -91,3 +91,6 @@
 [submodule "submodules/externals/webrtc"]
 	path = submodules/externals/webrtc
 	url = git://git.linphone.org/webrtc.git
+[submodule "submodules/externals/jiso8601"]
+	path = submodules/externals/jiso8601
+	url = https://github.com/gturri/jISO8601
