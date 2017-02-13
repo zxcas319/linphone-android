@@ -1,0 +1,50 @@
+{
+  "project_info": {
+    "project_number": "290889430912",
+    "firebase_url": "https://linphone-12450.firebaseio.com",
+    "project_id": "linphone-12450",
+    "storage_bucket": "linphone-12450.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290889430912:android:4662ea9a056188c4",
+        "android_client_info": {
+          "package_name": "org.linphone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290889430912-dk3lk7fg0cvn6mb6t71vssdefnh6pcn7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCItV-HAWdjb8QkQU90u-ImKe229yVE0NI"
+        },
+        {
+          "current_key": "AIzaSyBMir8tCMGAzRB0PpeqXKTNbAa_2nWDUKw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "290889430912-dk3lk7fg0cvn6mb6t71vssdefnh6pcn7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

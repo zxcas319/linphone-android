@@ -4,12 +4,15 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.google.gms:google-services:3.0.0'
     }
 }
-apply plugin: 'android'
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
+    compile 'com.google.firebase:firebase-messaging:9.0.0'
 }
 
 android {
@@ -19,10 +22,10 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['submodules/linphone/mediastreamer2/java/src','submodules/linphone/java/j2se','submodules/linphone/java/common','submodules/linphone/java/impl','submodules/externals/axmlrpc/src/main/java','submodules/linphone/coreapi/help/java','src']
-            resources.srcDirs = ['submodules/linphone/mediastreamer2/java/src','submodules/linphone/java/j2se','submodules/linphone/java/common','submodules/linphone/java/impl','submodules/externals/axmlrpc/src/main/java','submodules/linphone/coreapi/help/java','src']
-            aidl.srcDirs = ['submodules/linphone/mediastreamer2/java/src','submodules/linphone/java/j2se','submodules/linphone/java/common','submodules/linphone/java/impl','submodules/externals/axmlrpc/src/main/java','submodules/linphone/coreapi/help/java','src']
-            renderscript.srcDirs = ['submodules/linphone/mediastreamer2/java/src','submodules/linphone/java/j2se','submodules/linphone/java/common','submodules/linphone/java/impl','submodules/externals/axmlrpc/src/main/java','submodules/linphone/coreapi/help/java','src']
+            java.srcDirs = ['submodules/linphone/mediastreamer2/java/src', 'submodules/linphone/java/j2se', 'submodules/linphone/java/common', 'submodules/linphone/java/impl', 'submodules/externals/axmlrpc/src/main/java', 'submodules/linphone/coreapi/help/java', 'src']
+            resources.srcDirs = ['submodules/linphone/mediastreamer2/java/src', 'submodules/linphone/java/j2se', 'submodules/linphone/java/common', 'submodules/linphone/java/impl', 'submodules/externals/axmlrpc/src/main/java', 'submodules/linphone/coreapi/help/java', 'src']
+            aidl.srcDirs = ['submodules/linphone/mediastreamer2/java/src', 'submodules/linphone/java/j2se', 'submodules/linphone/java/common', 'submodules/linphone/java/impl', 'submodules/externals/axmlrpc/src/main/java', 'submodules/linphone/coreapi/help/java', 'src']
+            renderscript.srcDirs = ['submodules/linphone/mediastreamer2/java/src', 'submodules/linphone/java/j2se', 'submodules/linphone/java/common', 'submodules/linphone/java/impl', 'submodules/externals/axmlrpc/src/main/java', 'submodules/linphone/coreapi/help/java', 'src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
             jniLibs.srcDir 'libs'
