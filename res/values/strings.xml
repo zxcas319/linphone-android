@@ -141,8 +141,13 @@
     <!-- In-app -->
     <string name="inapp">In-app</string>
     <string name="inapp_notification_title">In-app purchase</string>
-    <string name="inapp_notification_trial_expire">The trail period expires on %s</string>
+    <string name="inapp_notification_trial_expiring">The trial period expires today</string>
+    <string name="inapp_notification_trial_expire">The trial period expires on %s</string>
+    <string name="inapp_notification_trial_expired">The trial period has expired since %s</string>
+    <string name="inapp_notification_account_expiring">The subscription period expires today</string>
     <string name="inapp_notification_account_expire">The subscription period expires on %s</string>
+    <string name="inapp_notification_account_expired">The subscription period has expired since %s</string>
+    <string name="day">day</string>
 
     <!-- Dailer -->
     <string name="address_bar_hint">Enter a number or an address</string>

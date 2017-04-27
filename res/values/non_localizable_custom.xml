@@ -46,7 +46,7 @@
 	<bool name="allow_cancel_remote_provisioning_login_activity">true</bool>
 
 	<!-- Inapp -->
-	<bool name="enable_in_app_purchase">false</bool>
+	<bool name="enable_in_app_purchase">true</bool>
 	<integer name="days_notification_shown">5</integer><!-- Notification shown before end of trial version in days -->
 	<integer name="time_between_inapp_notification">86400000</integer><!-- Time between two inapp notifications in milliseconds -->
 	<bool name="hide_username_in_inapp">true</bool>

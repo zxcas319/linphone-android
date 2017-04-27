@@ -19,42 +19,6 @@ package org.linphone;
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-
-import org.linphone.LinphoneManager.AddressType;
-import org.linphone.assistant.AssistantActivity;
-import org.linphone.assistant.RemoteProvisioningLoginActivity;
-import org.linphone.compatibility.Compatibility;
-import org.linphone.core.CallDirection;
-import org.linphone.core.LinphoneAddress;
-import org.linphone.core.LinphoneAuthInfo;
-import org.linphone.core.LinphoneCall;
-import org.linphone.core.LinphoneCall.State;
-import org.linphone.core.LinphoneCallLog;
-import org.linphone.core.LinphoneCallLog.CallStatus;
-import org.linphone.core.LinphoneChatMessage;
-import org.linphone.core.LinphoneChatRoom;
-import org.linphone.core.LinphoneCore;
-import org.linphone.core.LinphoneCore.RegistrationState;
-import org.linphone.core.LinphoneCoreException;
-import org.linphone.core.LinphoneCoreFactory;
-import org.linphone.core.LinphoneCoreListenerBase;
-import org.linphone.core.LinphoneProxyConfig;
-import org.linphone.core.Reason;
-import org.linphone.mediastream.Log;
-import org.linphone.purchase.InAppPurchaseActivity;
-import org.linphone.ui.AddressText;
-import org.linphone.xmlrpc.XmlRpcHelper;
-import org.linphone.xmlrpc.XmlRpcListenerBase;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -96,6 +60,43 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.linphone.LinphoneManager.AddressType;
+import org.linphone.assistant.AssistantActivity;
+import org.linphone.assistant.RemoteProvisioningLoginActivity;
+import org.linphone.compatibility.Compatibility;
+import org.linphone.core.CallDirection;
+import org.linphone.core.LinphoneAddress;
+import org.linphone.core.LinphoneAuthInfo;
+import org.linphone.core.LinphoneCall;
+import org.linphone.core.LinphoneCall.State;
+import org.linphone.core.LinphoneCallLog;
+import org.linphone.core.LinphoneCallLog.CallStatus;
+import org.linphone.core.LinphoneChatMessage;
+import org.linphone.core.LinphoneChatRoom;
+import org.linphone.core.LinphoneCore;
+import org.linphone.core.LinphoneCore.RegistrationState;
+import org.linphone.core.LinphoneCoreException;
+import org.linphone.core.LinphoneCoreFactory;
+import org.linphone.core.LinphoneCoreListenerBase;
+import org.linphone.core.LinphoneProxyConfig;
+import org.linphone.core.Reason;
+import org.linphone.mediastream.Log;
+import org.linphone.purchase.InAppPurchaseActivity;
+import org.linphone.ui.AddressText;
+import org.linphone.xmlrpc.XmlRpcHelper;
+import org.linphone.xmlrpc.XmlRpcListenerBase;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sylvain Berfini
@@ -1360,7 +1361,8 @@ public class LinphoneActivity extends LinphoneGenericActivity implements OnClick
 
 		if(getResources().getBoolean(R.bool.enable_in_app_purchase)){
 			isTrialAccount();
-		}
+		}else
+			getExpirationAccount();
 
 		updateMissedChatCount();
 
@@ -1734,9 +1736,9 @@ public class LinphoneActivity extends LinphoneGenericActivity implements OnClick
 						Calendar calresult = Calendar.getInstance();
 						calresult.setTimeInMillis(timestamp);
 
-						int diff = getDiffDays(calresult, Calendar.getInstance());
-						if (diff != -1 && diff <= getResources().getInteger(R.integer.days_notification_shown)) {
-							displayInappNotification(timestampToHumanDate(calresult));
+						int diff = getDaysCountSinceNow(calresult);
+						if (diff <= getResources().getInteger(R.integer.days_notification_shown)) {
+							displayInappNotification(timestampToHumanDate(calresult), diff);
 						}
 					}
 				}
@@ -1748,18 +1750,31 @@ public class LinphoneActivity extends LinphoneGenericActivity implements OnClick
 		}
 	}
 
-	public void displayInappNotification(String date) {
+	public void displayInappNotification(String date, int diff) {
 		Timestamp now = new Timestamp(new Date().getTime());
+		Log.e("====>>>> LinphoneActivity - displayInappNotification() - PopUpTime = "+LinphonePreferences.instance().getInappPopupTime()+" vs now = "+now.getTime());
 		if (LinphonePreferences.instance().getInappPopupTime() != null && Long.parseLong(LinphonePreferences.instance().getInappPopupTime()) > now.getTime()) {
 			return;
 		} else {
 			long newDate = now.getTime() + getResources().getInteger(R.integer.time_between_inapp_notification);
 			LinphonePreferences.instance().setInappPopupTime(String.valueOf(newDate));
+			Log.e("====>>>> LinphoneActivity - displayInappNotification() - PopUpTime = "+LinphonePreferences.instance().getInappPopupTime()+" vs now = "+now.getTime()+" vs newDate = "+newDate);
 		}
+		String s = (diff < -1)?"s":"";
 		if(isTrialAccount){
-			LinphoneService.instance().displayInappNotification(String.format(getString(R.string.inapp_notification_trial_expire), date));
+			if(diff == 0)
+				LinphoneService.instance().displayInappNotification(getString(R.string.inapp_notification_trial_expiring));
+			else if (diff < 0)
+				LinphoneService.instance().displayInappNotification(String.format(getString(R.string.inapp_notification_trial_expired), -diff+" "+getString(R.string.day))+""+s );
+			else
+				LinphoneService.instance().displayInappNotification(String.format(getString(R.string.inapp_notification_trial_expire), date));
 		} else {
-			LinphoneService.instance().displayInappNotification(String.format(getString(R.string.inapp_notification_account_expire), date));
+			if(diff == 0)
+				LinphoneService.instance().displayInappNotification(getString(R.string.inapp_notification_account_expire));
+			else if (diff < 0)
+				LinphoneService.instance().displayInappNotification(String.format(getString(R.string.inapp_notification_account_expired), -diff+" "+getString(R.string.day))+""+s );
+			else
+				LinphoneService.instance().displayInappNotification(String.format(getString(R.string.inapp_notification_account_expire), date));
 		}
 
 	}
@@ -1770,15 +1785,13 @@ public class LinphoneActivity extends LinphoneGenericActivity implements OnClick
 		return dateFormat.format(cal.getTime());
 	}
 
-	private int getDiffDays(Calendar cal1, Calendar cal2) {
-		if (cal1 == null || cal2 == null) {
-			return -1;
-		}
-		if(cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)){
-			return cal1.get(Calendar.DAY_OF_YEAR) - cal2.get(Calendar.DAY_OF_YEAR);
-		}
-		return -1;
+	private int getDaysCountSinceNow(Calendar date1){
+		Date now = (Calendar.getInstance()).getTime();
+		Date date = (date1).getTime();
+		long diff = date.getTime() - now.getTime();
+		return (int)(TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS));
 	}
+
 }
 
 interface ContactPicked {

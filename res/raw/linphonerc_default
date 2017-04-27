@@ -15,6 +15,7 @@ sip_tls_port=-1
 size=qvga
 
 [app]
+inapp_popup_time=3600
 tunnel=disabled
 push_notification=1
 auto_start=1
