@@ -42,8 +42,10 @@ import org.linphone.LinphoneService;
 import org.linphone.R;
 import org.linphone.core.Address;
 import org.linphone.core.Core;
+import org.linphone.core.Factory;
 import org.linphone.core.Friend;
 import org.linphone.core.FriendList;
+import org.linphone.core.MagicSearch;
 import org.linphone.core.ProxyConfig;
 import org.linphone.mediastream.Log;
 
@@ -61,6 +63,7 @@ public class ContactsManager extends ContentObserver {
 	private static ContactsManager instance;
 
 	private List<LinphoneContact> contacts, sipContacts;
+	private MagicSearch magicSearch;
 	private boolean preferLinphoneContacts = false, isContactPresenceDisabled = true;
 	private ContentResolver contentResolver;
 	private Context context;
@@ -84,11 +87,18 @@ public class ContactsManager extends ContentObserver {
 		contactsUpdatedListeners = new ArrayList<ContactsUpdatedListener>();
 		contacts = new ArrayList<LinphoneContact>();
 		sipContacts = new ArrayList<LinphoneContact>();
+		if (LinphoneManager.getLcIfManagerNotDestroyedOrNull() != null) {
+			magicSearch = LinphoneManager.getLcIfManagerNotDestroyedOrNull().createMagicSearch();
+		}
 	}
 
 	public void destroy() {
 		defaultAvatar.recycle();
 		instance = null;
+	}
+
+	public MagicSearch getMagicSearch() {
+		return magicSearch;
 	}
 
 	public boolean contactsFetchedOnce() {
@@ -301,6 +311,12 @@ public class ContactsManager extends ContentObserver {
 					LinphoneContact contact = (LinphoneContact) friend.getUserData();
 					if (contact != null) {
 						contact.clearAddresses();
+						LinphoneNumberOrAddress addr;
+						String newAddr = "sip:" + contact.getFullName().replace(' ', '.').toLowerCase() + "@sip.linphone.org";
+						addr = new LinphoneNumberOrAddress(newAddr, true);
+						contact.addNumberOrAddress(addr);
+						contact.save();
+						sipContacts.add(contact);
 						contacts.add(contact);
 						if (contact.getAndroidId() != null) {
 							androidContactsCache.put(contact.getAndroidId(), contact);
@@ -314,6 +330,15 @@ public class ContactsManager extends ContentObserver {
 							contact = new LinphoneContact();
 							contact.setFriend(friend);
 							contact.refresh();
+							if (contact.getNumbersOrAddresses().size() == 1) {
+								if (contact.getNumbersOrAddresses().get(0).getValue().indexOf("33") == 0) {
+									LinphoneNumberOrAddress addr;
+									String newAddr = "sip:" + contact.getFirstName() + "." + contact.getLastName() + "@sip.linphone.org";
+									addr = new LinphoneNumberOrAddress(newAddr, true);
+									contact.addNumberOrAddress(addr);
+									sipContacts.add(contact);
+								}
+							}
 							if (contact.hasAddress()) {
 								sipContacts.add(contact);
 							}

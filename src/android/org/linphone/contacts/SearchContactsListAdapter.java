@@ -33,6 +33,7 @@ import org.linphone.LinphoneUtils;
 import org.linphone.R;
 import org.linphone.activities.LinphoneActivity;
 import org.linphone.core.Address;
+import org.linphone.core.SearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -154,6 +155,8 @@ public class SearchContactsListAdapter extends BaseAdapter {
 		if (search == null || search.length() == 0 || search.trim().length() == 0) {
 			contacts = getContactsList();
 			resultContactsSearch.setAdapter(this);
+			if (ContactsManager.getInstance() != null)
+				ContactsManager.getInstance().getMagicSearch().resetSearchCache();
 			oldSize = 0;
 			return;
 		}
@@ -161,29 +164,18 @@ public class SearchContactsListAdapter extends BaseAdapter {
 		search = search.trim();
 		List<ContactAddress> result = new ArrayList<>();
 
-		String searchAddress = "sip:" + search + "@" + LinphoneManager.getLc().getDefaultProxyConfig().getDomain();
-		if (search.contains("@") || search.startsWith("sip:")) {
-			searchAddress = search;
-		}
-
-        boolean searchFound = false;
-		if (search != null) {
-			for (ContactAddress c : (search.length() < oldSize) ? getContactsList() : getContacts()) {
-				String address = c.getAddressAsDisplayableString();
-				if (address.equals(searchAddress)) searchFound = true;
-				if (address.startsWith("sip:")) address = address.substring(4);
-				if (c.getContact() != null && c.getContact().getFullName() != null
-						&& c.getContact().getFullName().toLowerCase(Locale.getDefault()).startsWith(search.toLowerCase(Locale.getDefault()))
-						|| address.toLowerCase(Locale.getDefault()).startsWith(search.toLowerCase(Locale.getDefault()))) {
-					result.add(c);
-				}
+		SearchResult[] searchResultsTab = ContactsManager.getInstance().getMagicSearch().getContactListFromFilter(search, "");
+		for (SearchResult sr : searchResultsTab) {
+			LinphoneContact contact = new LinphoneContact();
+			if (sr.getFriend() != null) {
+				contact.setFriend(sr.getFriend());
+				contact.refresh();
+			}
+			if (sr.getAddress() != null) {
+				contact.addNumberOrAddress(new LinphoneNumberOrAddress(sr.getAddress().asStringUriOnly(), true));
+				result.add(new ContactAddress(contact, sr.getAddress().asStringUriOnly(), contact.isFriend()));
 			}
 		}
-		if (!searchFound) {
-			LinphoneContact searchContact = new LinphoneContact();
-			searchContact.setFullName(search);
-			result.add(new ContactAddress(searchContact, searchAddress, false));
-        }
 
 		oldSize = search.length();
 		contacts = result;
